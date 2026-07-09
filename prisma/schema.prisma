@@ -1,0 +1,303 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/////////////////////////////////////////////////////
+// ENUMS
+/////////////////////////////////////////////////////
+
+enum UserRole {
+  ADMIN
+}
+
+enum OrderType {
+  DELIVERY
+  TAKEAWAY
+  DINE_IN
+}
+
+enum OrderStatus {
+  CONFIRMED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  WAITING_PICKUP
+  FINISHED
+  CANCELED
+}
+
+enum MealSize {
+  M
+  G
+}
+
+enum IngredientType {
+  PROTEIN
+  BASE
+  BEAN
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+/////////////////////////////////////////////////////
+// USER
+/////////////////////////////////////////////////////
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(ADMIN)
+
+  orders    Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/////////////////////////////////////////////////////
+// CUSTOMER
+/////////////////////////////////////////////////////
+
+model Customer {
+  id        String @id @default(uuid())
+
+  name      String
+  phone     String @unique
+  address   String?
+
+  orders    Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/////////////////////////////////////////////////////
+// ORDER
+/////////////////////////////////////////////////////
+
+model Order {
+  id          String @id @default(uuid())
+
+  orderNumber Int @unique
+
+  customerId  String
+  userId      String
+
+  type        OrderType
+  status      OrderStatus @default(CONFIRMED)
+
+  total       Decimal @db.Decimal(10,2)
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  meals Meal[]
+
+  products OrderProduct[]
+
+  payment Payment?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([userId])
+  @@index([status])
+}
+
+/////////////////////////////////////////////////////
+// MEAL
+/////////////////////////////////////////////////////
+
+model Meal {
+  id String @id @default(uuid())
+
+  orderId String
+
+  size MealSize
+
+  proteinId String
+  beanId String
+
+  quantity Int @default(1)
+
+  unitPrice Decimal @db.Decimal(10,2)
+  subtotal Decimal @db.Decimal(10,2)
+
+  observation String?
+
+  order Order @relation(fields: [orderId], references: [id])
+
+protein Ingredient @relation("MealProtein", fields: [proteinId], references: [id])
+
+bean Ingredient @relation("MealBean", fields: [beanId], references: [id])
+
+  bases MealBase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+}
+
+/////////////////////////////////////////////////////
+// MEAL BASE
+/////////////////////////////////////////////////////
+
+model MealBase {
+  id String @id @default(uuid())
+
+  mealId String
+
+  ingredientId String
+
+  meal Meal @relation(fields: [mealId], references: [id])
+
+  ingredient Ingredient @relation(fields: [ingredientId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([mealId])
+
+  @@index([ingredientId])
+}
+
+/////////////////////////////////////////////////////
+// INGREDIENT
+/////////////////////////////////////////////////////
+
+model Ingredient {
+  id String @id @default(uuid())
+
+  name String
+
+  type IngredientType
+
+  available Boolean @default(true)
+
+  proteins Meal[] @relation("MealProtein")
+
+  beans Meal[] @relation("MealBean")
+
+  bases MealBase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+}
+
+/////////////////////////////////////////////////////
+// CATEGORY
+/////////////////////////////////////////////////////
+
+model Category {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/////////////////////////////////////////////////////
+// PRODUCT
+/////////////////////////////////////////////////////
+
+model Product {
+  id String @id @default(uuid())
+
+  categoryId String
+
+  name String
+
+  price Decimal @db.Decimal(10,2)
+
+  available Boolean @default(true)
+
+  category Category @relation(fields: [categoryId], references: [id])
+
+  orderProducts OrderProduct[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+/////////////////////////////////////////////////////
+// ORDER PRODUCT
+/////////////////////////////////////////////////////
+
+model OrderProduct {
+  id String @id @default(uuid())
+
+  orderId String
+
+  productId String
+
+  quantity Int
+
+  unitPrice Decimal @db.Decimal(10,2)
+
+  subtotal Decimal @db.Decimal(10,2)
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+
+  @@index([productId])
+}
+
+/////////////////////////////////////////////////////
+// PAYMENT
+/////////////////////////////////////////////////////
+
+model Payment {
+  id String @id @default(uuid())
+
+  orderId String @unique
+
+  method PaymentMethod
+
+  status PaymentStatus @default(PENDING)
+
+  amount Decimal @db.Decimal(10,2)
+
+  paidAt DateTime?
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
