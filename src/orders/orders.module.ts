@@ -5,9 +5,11 @@ import { MealBasesModule } from './meal-bases/meal-bases.module';
 import { OrderProductsModule } from './order-products/order-products.module';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+import { CustomersModule } from 'src/customers/customers.module';
+
 
 @Module({
-  imports: [PaymentsModule, MealsModule, MealBasesModule, OrderProductsModule],
+  imports: [PaymentsModule, MealsModule, MealBasesModule, OrderProductsModule, CustomersModule],
   providers: [OrdersService],
   controllers: [OrdersController]
 })
