@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCustomerDto } from './CreateCostumer.dto';
+import { UpdateCustomerDto } from './customerUpdate.dto';
 
 @Injectable()
 export class CustomersService {
@@ -9,7 +10,7 @@ export class CustomersService {
     }
 
 
-    //cadastrar cliente 
+    ////////cadastrar cliente 
 async cadastrarCliente( CadastroClienteDto : CreateCustomerDto){
     
     //checar se ja existe
@@ -38,7 +39,7 @@ async cadastrarCliente( CadastroClienteDto : CreateCustomerDto){
 }
 
 
-//identificar cliente pelo numero
+//////////exibir  cliente pelo numero
 async IdentificarPorTel(tel : string){
 
     const ClienteExists = await this.prisma.customer.findUnique({
@@ -57,6 +58,44 @@ async IdentificarPorTel(tel : string){
 
 
 }
+
+// listar todos os clientes
+async todosClientes() {
+
+    const clientes = await this.prisma.customer.findMany({
+        orderBy: {
+            createdAt: 'desc',
+        },
+    });
+
+    return clientes;
+}
+
+////atualizar cliente
+async atualizaCliente(clienteDto : UpdateCustomerDto, idCliente : string){
+
+    const ClienteExists = await this.prisma.customer.findUnique({
+        where : {
+            phone : idCliente
+        }
+    })
+
+    if(!ClienteExists){
+        throw new NotFoundException('Cliente não existe logo não pode ser alterado')
+    }
+
+    //atualizar cliente
+    const cliente = await this.prisma.customer.update({
+        where : {
+            phone : idCliente,
+        },
+        data : clienteDto
+    })
+
+    return cliente
+
+}
+
 
 
 }

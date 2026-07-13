@@ -6,11 +6,12 @@ import { OrderProductsModule } from './order-products/order-products.module';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { CustomersModule } from 'src/customers/customers.module';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 
 @Module({
   imports: [PaymentsModule, MealsModule, MealBasesModule, OrderProductsModule, CustomersModule],
-  providers: [OrdersService],
+  providers: [OrdersService, PrismaService],
   controllers: [OrdersController]
 })
 export class OrdersModule {}
