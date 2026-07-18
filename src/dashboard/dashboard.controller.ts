@@ -36,6 +36,19 @@ async recentOrders() {
   };
 }
 
+/////////////////////////////////////////////////////
+// FILA DA COZINHA
+/////////////////////////////////////////////////////
+
+@Get('kitchen')
+async kitchenQueue() {
+  const queue = await this.dashboardService.kitchenQueue();
+
+  return {
+    message: 'Fila da cozinha retornada com sucesso.',
+    data: queue,
+  };
+}
 
 }
 

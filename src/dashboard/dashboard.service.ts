@@ -81,4 +81,54 @@ async recentOrders() {
   });
 }
 
+
+/////////////////////////////////////////////////////
+// FILA DA COZINHA
+/////////////////////////////////////////////////////
+
+async kitchenQueue() {
+  return await this.prisma.order.findMany({
+    where: {
+      status: {
+        in: [
+          OrderStatus.CONFIRMED,
+          OrderStatus.PREPARING,
+          OrderStatus.READY,
+        ],
+      },
+    },
+    orderBy: {
+      createdAt: 'asc',
+    },
+    include: {
+      customer: {
+        select: {
+          name: true,
+          phone: true,
+        },
+      },
+
+      meals: {
+        include: {
+          protein: true,
+          bean: true,
+          bases: {
+            include: {
+              ingredient: true,
+            },
+          },
+        },
+      },
+
+      products: {
+        include: {
+          product: true,
+        },
+      },
+
+      payment: true,
+    },
+  });
+}
+
 }
