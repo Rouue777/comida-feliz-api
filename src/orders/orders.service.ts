@@ -486,4 +486,33 @@ async cancelarPedido(idOrder: string) {
 }
 
 
+///buscar por status pedido
+async buscarPedidosPorStatus(status: OrderStatus) {
+  return await this.prisma.order.findMany({
+    where: {
+      status,
+    },
+    include: {
+      customer: true,
+      payment: true,
+      meals: {
+        include: {
+          protein: true,
+          bean: true,
+          bases: {
+            include: {
+              ingredient: true,
+            },
+          },
+        },
+      },
+      products: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  });
+}
+
 }

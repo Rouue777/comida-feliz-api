@@ -5,6 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { use } from 'passport';
 import { retry } from 'rxjs';
 import { UpdateOrderStatusDto } from './updateOrderStatusDto.dto';
+import { OrderStatus } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
@@ -69,7 +70,15 @@ async cancelOrder(
 }
 
 
+////-- buscar pedidos por status
+@UseGuards(JwtAuthGuard)
+@Get('status/:status')
+async buscarPorStatus(
+  @Param('status') status: OrderStatus,
+) {
+  return this.orderService.buscarPedidosPorStatus(status);
 }
 
 
 
+}
