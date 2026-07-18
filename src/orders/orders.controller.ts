@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './createOrder.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { use } from 'passport';
 import { retry } from 'rxjs';
+import { UpdateOrderStatusDto } from './updateOrderStatusDto.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -35,7 +36,7 @@ async getByid(
 
      return this.orderService.buscarPedidoById(idOrder)
   
-    }
+}
 
 
 ///listar todos pedidos
@@ -46,6 +47,16 @@ async getAll(){
     return this.orderService.listarPedidos()
 }
 
+///alterar status do pedido
+@Patch(':orderId')
+async alterarStatus(
+    @Param("orderId") idOrder : string,
+    @Body()  updateStatus : UpdateOrderStatusDto
+){
+
+    return this.orderService.alteraStatus(updateStatus, idOrder)
+
+}
 
 
 }

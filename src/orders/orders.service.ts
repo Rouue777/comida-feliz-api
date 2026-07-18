@@ -5,6 +5,7 @@ import { CustomersService } from 'src/customers/customers.service';
 import { CreateOrderProductDto } from './productDto.dto';
 import { MealSize, OrderType, PaymentStatus} from '@prisma/client';
 import { CreatePaymentDto } from './paymentDto.dto';
+import { UpdateOrderStatusDto } from './updateOrderStatusDto.dto';
 
 @Injectable()
 export class OrdersService {
@@ -442,6 +443,29 @@ async listarPedidos() {
   });
 
   return orders;
+}
+
+
+///-- alterar status 
+
+async alteraStatus(
+  statusDto: UpdateOrderStatusDto,
+  idOrder: string,
+) {
+  // Verifica se o pedido existe
+  await this.buscarPedidoById(idOrder);
+
+  // Atualiza o status
+  const order = await this.prisma.order.update({
+    where: {
+      id: idOrder,
+    },
+    data: {
+      status: statusDto.status,
+    },
+  });
+
+  return order;
 }
 
 
