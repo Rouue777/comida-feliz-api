@@ -54,4 +54,31 @@ export class DashboardService {
       ).length,
     };
   }
+
+/////////////////////////////////////////////////////
+// PEDIDOS RECENTES
+/////////////////////////////////////////////////////
+
+async recentOrders() {
+  return await this.prisma.order.findMany({
+    take: 10,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      total: true,
+      createdAt: true,
+      customer: {
+        select: {
+          name: true,
+          phone: true,
+        },
+      },
+    },
+  });
+}
+
 }

@@ -20,4 +20,23 @@ export class DashboardController {
       data: dashboard,
     };
   }
+
+
+/////////////////////////////////////////////////////
+// PEDIDOS RECENTES
+/////////////////////////////////////////////////////
+
+@Get('recent-orders')
+async recentOrders() {
+  const orders = await this.dashboardService.recentOrders();
+
+  return {
+    message: 'Pedidos recentes encontrados com sucesso.',
+    data: orders,
+  };
 }
+
+
+}
+
+
