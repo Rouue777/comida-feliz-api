@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './createOrder.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { use } from 'passport';
 
 @Controller('orders')
 export class OrdersController {
@@ -23,4 +24,20 @@ async create(
 
 }
 
+
+//buscar pedido pelo id
+@UseGuards(JwtAuthGuard)
+@Get(':orderId')
+async getByid(
+    @Param('orderId') idOrder : string
+){
+
+     return this.orderService.buscarPedidoById(idOrder)
+  
+    }
+
+
 }
+
+
+

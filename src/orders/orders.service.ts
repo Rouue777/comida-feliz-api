@@ -354,4 +354,55 @@ async create(dto: CreateOrderDto, userId : string) {
   };
 }
 
+
+
+//service buscar pedidodo 
+
+async buscarPedidoById(idOrder: string) {
+  const order = await this.prisma.order.findUnique({
+    where: {
+      id: idOrder,
+    },
+    include: {
+      customer: true,
+
+      payment: true,
+
+      meals: {
+        include: {
+          protein: true,
+
+          bean: true,
+
+          bases: {
+            include: {
+              ingredient: true,
+            },
+          },
+        },
+      },
+
+      products: {
+        include: {
+          product: true,
+        },
+      },
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  if (!order) {
+    throw new NotFoundException('Pedido não encontrado.');
+  }
+
+  return order;
+}
+
 }
