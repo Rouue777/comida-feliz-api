@@ -50,6 +50,21 @@ async kitchenQueue() {
   };
 }
 
+
+/////////////////////////////////////////////////////
+// MENU
+/////////////////////////////////////////////////////
+
+@Get('menu')
+async menu() {
+  const menu = await this.dashboardService.menu();
+
+  return {
+    message: 'Menu carregado com sucesso.',
+    data: menu,
+  };
+}
+
 }
 
 

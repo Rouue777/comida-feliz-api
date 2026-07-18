@@ -131,4 +131,37 @@ async kitchenQueue() {
   });
 }
 
+/////////////////////////////////////////////////////
+// MENU
+/////////////////////////////////////////////////////
+
+async menu() {
+  const ingredients = await this.prisma.ingredient.findMany({
+    orderBy: {
+      type: 'asc',
+    },
+  });
+
+  const categories = await this.prisma.category.findMany({
+    orderBy: {
+      name: 'asc',
+    },
+  });
+
+  const products = await this.prisma.product.findMany({
+    include: {
+      category: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
+
+  return {
+    ingredients,
+    categories,
+    products,
+  };
+}
+
 }
