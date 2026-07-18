@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMealDto, CreateOrderDto } from './createOrder.dto';
 import { CustomersService } from 'src/customers/customers.service';
 import { CreateOrderProductDto } from './productDto.dto';
-import { MealSize, OrderType, PaymentStatus} from '@prisma/client';
+import { MealSize, OrderStatus, OrderType, PaymentStatus} from '@prisma/client';
 import { CreatePaymentDto } from './paymentDto.dto';
 import { UpdateOrderStatusDto } from './updateOrderStatusDto.dto';
 
@@ -469,6 +469,21 @@ async alteraStatus(
 }
 
 
+//cancelar pedido
+async cancelarPedido(idOrder: string) {
+  await this.buscarPedidoById(idOrder);
+
+  return this.prisma.order.update({
+    where: {
+      id: idOrder,
+    },
+    data: {
+      status: OrderStatus.CANCELED,
+    },
+  });
+
+  
+}
 
 
 }

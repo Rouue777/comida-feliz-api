@@ -48,7 +48,8 @@ async getAll(){
 }
 
 ///alterar status do pedido
-@Patch(':orderId')
+@UseGuards(JwtAuthGuard)
+@Patch(':orderId/status')
 async alterarStatus(
     @Param("orderId") idOrder : string,
     @Body()  updateStatus : UpdateOrderStatusDto
@@ -56,6 +57,15 @@ async alterarStatus(
 
     return this.orderService.alteraStatus(updateStatus, idOrder)
 
+}
+
+///cancelar pedido
+@UseGuards(JwtAuthGuard)
+@Patch(":orderId/cancel")
+async cancelOrder(
+    @Param('orderId') idOrder : string
+){ 
+    return this.orderService.cancelarPedido(idOrder)
 }
 
 
