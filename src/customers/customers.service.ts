@@ -96,6 +96,27 @@ async atualizaCliente(clienteDto : UpdateCustomerDto, idCliente : string){
 
 }
 
+//validar costumer 
+
+async validarCliente( phone : string){
+
+    const ClienteExists = await this.prisma.customer.findUnique({
+        where : {
+            phone : phone
+        }
+    })
+
+    if(!ClienteExists){
+        throw new NotFoundException("Cliente não existe")
+    }
+
+
+    return ClienteExists;
+
+
+
+}
+
 
 
 }

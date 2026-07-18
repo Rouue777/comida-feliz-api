@@ -104,7 +104,7 @@ model Order {
 
   customerId  String
   userId      String
-h
+
   type        OrderType
   status      OrderStatus @default(CONFIRMED)
 
