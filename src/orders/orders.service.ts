@@ -297,7 +297,7 @@ private async createPayment(
 ////////////////////////--Service para rotas--//////////////////////////
 
 
-
+///////create order 
 async create(dto: CreateOrderDto, userId : string) {
 
   // Buscar cliente
@@ -404,5 +404,47 @@ async buscarPedidoById(idOrder: string) {
 
   return order;
 }
+
+//listar pedidos
+async listarPedidos() {
+  const orders = await this.prisma.order.findMany({
+    include: {
+      customer: true,
+
+      payment: true,
+
+      meals: {
+        include: {
+          protein: true,
+          bean: true,
+          bases: {
+            include: {
+              ingredient: true,
+            },
+          },
+        },
+      },
+
+      products: {
+        include: {
+          product: true,
+        },
+      },
+
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  return orders;
+}
+
+
+
 
 }

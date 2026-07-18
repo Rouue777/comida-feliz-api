@@ -3,6 +3,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './createOrder.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
 import { use } from 'passport';
+import { retry } from 'rxjs';
 
 @Controller('orders')
 export class OrdersController {
@@ -35,6 +36,16 @@ async getByid(
      return this.orderService.buscarPedidoById(idOrder)
   
     }
+
+
+///listar todos pedidos
+@UseGuards(JwtAuthGuard)
+@Get('/')
+async getAll(){
+
+    return this.orderService.listarPedidos()
+}
+
 
 
 }
