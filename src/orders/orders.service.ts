@@ -515,4 +515,15 @@ async buscarPedidosPorStatus(status: OrderStatus) {
   });
 }
 
+///async mealPrices() {
+
+async mealPrices() {
+
+    return {
+        M: 20,
+        G: 30,
+    };
+
+}
+
 }

@@ -80,5 +80,18 @@ async buscarPorStatus(
 }
 
 
+////valort da marmita 
+@Get("meal/prices")
+async mealPrices() {
+
+    return {
+        message: "Preços das marmitas retornados com sucesso.",
+        data: {
+            M: 20,
+            G: 30,
+        },
+    };
+
+}
 
 }
