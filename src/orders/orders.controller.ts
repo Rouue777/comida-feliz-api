@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './createOrder.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt.auth.guard';
@@ -42,10 +42,16 @@ async getByid(
 
 ///listar todos pedidos
 @UseGuards(JwtAuthGuard)
-@Get('/')
-async getAll(){
+@Get()
+async getAll(
+  @Query('phone') phone?: string,
+  @Query('status') status?: OrderStatus,
+  @Query('date') date?: string,
+  @Query('page') page?: number,
+  @Query('limit') limit?: number,
+){
 
-    return this.orderService.listarPedidos()
+    return this.orderService.listarPedidos({ phone, status, date, page, limit })
 }
 
 ///alterar status do pedido
@@ -86,10 +92,7 @@ async mealPrices() {
 
     return {
         message: "Preços das marmitas retornados com sucesso.",
-        data: {
-            M: 20,
-            G: 30,
-        },
+        data: this.orderService.mealPrices(),
     };
 
 }

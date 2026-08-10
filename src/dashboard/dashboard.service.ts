@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, OrderType } from '@prisma/client';
 
 @Injectable()
 export class DashboardService {
@@ -161,6 +161,63 @@ async menu() {
     ingredients,
     categories,
     products,
+  };
+}
+
+async getSummary() {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const whereToday = {
+    createdAt: {
+      gte: startOfDay,
+      lte: endOfDay,
+    },
+  };
+
+  const [
+    ordersToday,
+    averageTicket,
+    lastOrder,
+    deliveryOrders,
+    dineInOrders,
+    cancelledOrders,
+  ] = await Promise.all([
+    this.prisma.order.count({ where: whereToday }),
+    this.prisma.order.aggregate({
+      where: whereToday,
+      _avg: { total: true },
+    }),
+    this.prisma.order.findFirst({
+      where: whereToday,
+      orderBy: { createdAt: 'desc' },
+      select: { createdAt: true },
+    }),
+    this.prisma.order.count({
+      where: { ...whereToday, type: OrderType.DELIVERY },
+    }),
+    this.prisma.order.count({
+      where: { ...whereToday, type: OrderType.DINE_IN },
+    }),
+    this.prisma.order.count({
+      where: { ...whereToday, status: OrderStatus.CANCELED },
+    }),
+  ]);
+
+  return {
+    ordersToday,
+    averageTicket: averageTicket._avg.total ?? 0,
+    lastOrderTime:
+      lastOrder?.createdAt.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }) ?? '--:--',
+    deliveryOrders,
+    dineInOrders,
+    cancelledOrders,
   };
 }
 

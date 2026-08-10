@@ -407,8 +407,49 @@ async buscarPedidoById(idOrder: string) {
 }
 
 //listar pedidos
-async listarPedidos() {
+async listarPedidos(filters: {
+  phone?: string;
+  status?: OrderStatus;
+  date?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const page = Number(filters.page) || 1;
+  const limit = Number(filters.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const startDate = filters.date
+    ? new Date(`${filters.date}T00:00:00`)
+    : undefined;
+  const endDate = startDate
+    ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() + 1)
+    : undefined;
+
+  const where = {
+    ...(filters.phone && {
+      customer: {
+        phone: {
+          contains: filters.phone,
+        },
+      },
+    }),
+    ...(filters.status && {
+      status: filters.status,
+    }),
+    ...(startDate && endDate && {
+      createdAt: {
+        gte: startDate,
+        lt: endDate,
+      },
+    }),
+  };
+
+  const total = await this.prisma.order.count({ where });
+
   const orders = await this.prisma.order.findMany({
+    skip,
+    take: limit,
+    where,
     include: {
       customer: true,
 
@@ -442,7 +483,13 @@ async listarPedidos() {
     },
   });
 
-  return orders;
+  return {
+    data: orders,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
 }
 
 
@@ -517,7 +564,7 @@ async buscarPedidosPorStatus(status: OrderStatus) {
 
 ///async mealPrices() {
 
-async mealPrices() {
+mealPrices() {
 
     return {
         M: 20,
