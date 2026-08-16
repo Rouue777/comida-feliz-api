@@ -8,7 +8,7 @@ async function bootstrap() {
 
   // Permite acesso do frontend
   app.enableCors({
-    origin: "http://localhost:3001", // altere se seu Next estiver em outra porta
+    origin: "https://comida-feliz-web.onrender.com", // altere se seu Next estiver em outra porta
     credentials: true,
   });
 
